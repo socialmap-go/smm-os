@@ -61,7 +61,7 @@
                 msgBox.innerText = result.message + " (" + result.role + " ලෙස)";
                 msgBox.style.color = "green";
                 // මීළඟට අපි මෙතනින් Dashboard එකට යන විදිහ හදමු
-            } else {
+            } else {`window.location.href = "dashboard.html";`
                 msgBox.innerText = result.message;
                 msgBox.style.color = "red";
             }
