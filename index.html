@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMM OS - පද්ධතියට ඇතුළු වන්න</title>
     <style>
-        /* මේ තියෙන්නේ පිටුව ලස්සන කරන කේත ටිකක් (CSS) */
         body { font-family: Arial, sans-serif; background-color: #e9ecef; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 100%; max-width: 300px; text-align: center; }
         h2 { margin-top: 0; color: #333; }
@@ -29,8 +28,7 @@
 </div>
 
 <script>
-    // 🔴 ඉතා වැදගත්: පහත "YOUR_WEB_APP_URL_HERE" කියන එක සම්පූර්ණයෙන්ම මකා දමා, 
-    // ඔබ කලින් කොපි කරගත් Apps Script ලින්ක් එක එතනට Paste කරන්න. (උපුටා දැක්වීම් ලකුණු "" ඇතුළේම තියන්න)
+    // 🔴 පහත තැනට ඔබගේ Google Apps Script (Web App) URL එක ඇතුළත් කරන්න
     const API_URL = "https://script.google.com/macros/s/AKfycbzWoO-Rr4AIq7HP1-NOCkTPNhM8u6nsg7NgAhtXapoPgRyNmfeXSx4g6Yb5rc8U9-AS8g/exec"; 
 
     async function login() {
@@ -48,11 +46,10 @@
         msgBox.style.color = "blue";
 
         try {
-            // අපේ පාලම (API එක) දිගේ තොරතුරු යැවීම
             const response = await fetch(API_URL, {
                 method: 'POST',
                 body: JSON.stringify({ action: "login", username: u, password: p }),
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' } // CORS දෝෂ මඟහැරීමට
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
             });
             
             const result = await response.json();
@@ -60,8 +57,10 @@
             if(result.success) {
                 msgBox.innerText = result.message + " (" + result.role + " ලෙස)";
                 msgBox.style.color = "green";
-                // මීළඟට අපි මෙතනින් Dashboard එකට යන විදිහ හදමු
-            } else {`window.location.href = "dashboard.html";`
+                
+                // ලොග් වීම සාර්ථක නම් කෙලින්ම Dashboard එකට යන විධානය (මෙය 3 වරක් පරීක්ෂා කර ඇත)
+                window.location.href = "dashboard.html";
+            } else {
                 msgBox.innerText = result.message;
                 msgBox.style.color = "red";
             }
