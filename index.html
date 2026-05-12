@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMM OS - පද්ධතියට ඇතුළු වන්න</title>
+    <style>
+        /* මේ තියෙන්නේ පිටුව ලස්සන කරන කේත ටිකක් (CSS) */
+        body { font-family: Arial, sans-serif; background-color: #e9ecef; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 100%; max-width: 300px; text-align: center; }
+        h2 { margin-top: 0; color: #333; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+        #message { margin-top: 15px; font-size: 14px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>SMM OS</h2>
+    <p>කරුණාකර පද්ධතියට ඇතුළු වන්න</p>
+    
+    <input type="text" id="username" placeholder="Username (උදා: admin)">
+    <input type="password" id="password" placeholder="Password (උදා: admin123)">
+    <button onclick="login()">ඇතුළු වන්න</button>
+    
+    <div id="message"></div>
+</div>
+
+<script>
+    // 🔴 ඉතා වැදගත්: පහත "YOUR_WEB_APP_URL_HERE" කියන එක සම්පූර්ණයෙන්ම මකා දමා, 
+    // ඔබ කලින් කොපි කරගත් Apps Script ලින්ක් එක එතනට Paste කරන්න. (උපුටා දැක්වීම් ලකුණු "" ඇතුළේම තියන්න)
+    const API_URL = "https://script.google.com/macros/s/AKfycbzWoO-Rr4AIq7HP1-NOCkTPNhM8u6nsg7NgAhtXapoPgRyNmfeXSx4g6Yb5rc8U9-AS8g/exec"; 
+
+    async function login() {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        const msgBox = document.getElementById('message');
+        
+        if(u === "" || p === "") {
+            msgBox.innerText = "කරුණාකර Username සහ Password ඇතුළත් කරන්න.";
+            msgBox.style.color = "red";
+            return;
+        }
+
+        msgBox.innerText = "පරීක්ෂා කරමින් පවතී... කරුණාකර රැඳී සිටින්න.";
+        msgBox.style.color = "blue";
+
+        try {
+            // අපේ පාලම (API එක) දිගේ තොරතුරු යැවීම
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: "login", username: u, password: p }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' } // CORS දෝෂ මඟහැරීමට
+            });
+            
+            const result = await response.json();
+            
+            if(result.success) {
+                msgBox.innerText = result.message + " (" + result.role + " ලෙස)";
+                msgBox.style.color = "green";
+                // මීළඟට අපි මෙතනින් Dashboard එකට යන විදිහ හදමු
+            } else {
+                msgBox.innerText = result.message;
+                msgBox.style.color = "red";
+            }
+        } catch (error) {
+            msgBox.innerText = "අන්තර්ජාල දෝෂයක්. කරුණාකර පසුව උත්සාහ කරන්න.";
+            msgBox.style.color = "red";
+        }
+    }
+</script>
+</body>
+</html>
