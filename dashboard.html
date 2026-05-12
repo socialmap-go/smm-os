@@ -7,14 +7,23 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f7f6; }
         .header { background-color: #2c3e50; color: white; padding: 15px; text-align: center; }
-        .container { padding: 20px; }
+        .container { padding: 20px; max-width: 800px; margin: auto; }
         
+        /* අලුත් සේවාදායකයින් එකතු කරන ෆෝරමයේ හැඩය */
+        .form-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px; }
+        .form-box h3 { margin-top: 0; color: #333; }
+        .form-box input, .form-box textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        .form-box button { background-color: #28a745; color: white; border: none; padding: 12px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
+        .form-box button:hover { background-color: #218838; }
+        #form-msg { margin-top: 15px; font-weight: bold; text-align: center; font-size: 14px; }
+
+        /* AI Chat Box එකේ හැඩය */
         .chat-widget { position: fixed; bottom: 20px; right: 20px; width: 320px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; z-index: 1000; }
         .chat-header { background: #007bff; color: white; padding: 12px; font-weight: bold; cursor: pointer; text-align: center; font-size: 16px; }
         .chat-body { height: 350px; padding: 15px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 10px; }
         .chat-input-area { display: flex; border-top: 1px solid #ccc; background: white; }
         .chat-input-area input { flex: 1; padding: 12px; border: none; outline: none; font-size: 14px; }
-        .chat-input-area button { padding: 12px 15px; background: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .chat-input-area button { padding: 12px 15px; background: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
         
         .message { padding: 10px; border-radius: 8px; max-width: 85%; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
         .user-msg { background: #d1e7dd; align-self: flex-end; border-bottom-right-radius: 0; }
@@ -24,30 +33,91 @@
 <body>
 
 <div class="header">
-    <h1>SMM OS - ප්‍රධාන පුවරුව (Dashboard)</h1>
+    <h1>SMM OS - ප්‍රධාන පුවරුව</h1>
 </div>
 
 <div class="container">
-    <h2>ආයුබෝවන්! පද්ධතියට සාදරයෙන් පිළිගනිමු.</h2>
-    <p>අපි ඉදිරියේදී සේවාදායකයින් (Clients) සහ කාර්යයන් (Tasks) කළමනාකරණය කරන කොටස් මෙතනට එකතු කරමු.</p>
-    <p>දැනට දකුණු පැත්තේ පහළ ඇති <b>AI සහයකයාගේ (Chat Box)</b> ක්‍රියාකාරීත්වය පරීක්ෂා කර බලන්න!</p>
+    <h2>ආයුබෝවන්!</h2>
+    
+    <div class="form-box">
+        <h3>➕ අලුත් සේවාදායකයෙක් (Client) එකතු කරන්න</h3>
+        <input type="text" id="bizName" placeholder="ව්‍යාපාරයේ නම (උදා: Mapa Gifts)">
+        <input type="text" id="bizNiche" placeholder="ව්‍යාපාරයේ වර්ගය (උදා: තෑගි භාණ්ඩ / සපත්තු)">
+        <input type="text" id="bizLoc" placeholder="ප්‍රදේශය (උදා: රත්නපුර)">
+        <textarea id="bizNotes" rows="3" placeholder="විශේෂ කරුණු (අවශ්‍ය නම් පමණක් ලියන්න)"></textarea>
+        <button onclick="addClient()">පද්ධතියට ඇතුළත් කරන්න</button>
+        <div id="form-msg"></div>
+    </div>
 </div>
 
 <div class="chat-widget">
-    <div class="chat-header" onclick="toggleChat()">🤖 පද්ධතියේ AI සහයකයා</div>
-    <div class="chat-body" id="chat-body">
-        <div class="message ai-msg">ආයුබෝවන්! මම SMM OS පද්ධතියේ AI සහයකයා. කේත ලිවීමට, අදහස් ලබාදීමට හෝ පද්ධතිය ගැන විස්තර දීමට මට පුළුවන්. මගෙන් ඕනෑම දෙයක් අසන්න.</div>
+    <div class="chat-header" onclick="toggleChat()">🤖 AI සහයකයා (Click to Open)</div>
+    <div class="chat-body" id="chat-body" style="display: none;">
+        <div class="message ai-msg">ආයුබෝවන්! මම SMM OS පද්ධතියේ AI සහයකයා. මගෙන් ඕනෑම දෙයක් අසන්න.</div>
     </div>
-    <div class="chat-input-area" id="chat-input-area">
+    <div class="chat-input-area" id="chat-input-area" style="display: none;">
         <input type="text" id="chat-input" placeholder="ඔබේ ගැටලුව ලියන්න...">
         <button onclick="sendMessage()">යවන්න</button>
     </div>
 </div>
 
 <script>
+    // 🔴 ඉතා වැදගත්: මෙතනට ඔයාගේ යතුරු දෙකම අනිවාර්යයෙන්ම දාන්න
     const GEMINI_API_KEY = "AIzaSyDRq-KH9Bn9mYW7hPUgeFH-SSrHafJ1eyY";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzWoO-Rr4AIq7HP1-NOCkTPNhM8u6nsg7NgAhtXapoPgRyNmfeXSx4g6Yb5rc8U9-AS8g/exec";
 
-    let chatOpen = true;
+    // අලුත් සේවාදායකයෙක් එකතු කිරීමේ කේතය
+    async function addClient() {
+        const name = document.getElementById('bizName').value;
+        const niche = document.getElementById('bizNiche').value;
+        const loc = document.getElementById('bizLoc').value;
+        const notes = document.getElementById('bizNotes').value;
+        const msgBox = document.getElementById('form-msg');
+
+        if (!name || !niche || !loc) {
+            msgBox.innerText = "කරුණාකර නම, වර්ගය සහ ප්‍රදේශය ඇතුළත් කරන්න.";
+            msgBox.style.color = "red";
+            return;
+        }
+
+        msgBox.innerText = "පද්ධතියට ඇතුළත් කරමින් පවතී... රැඳී සිටින්න.";
+        msgBox.style.color = "blue";
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    action: "addClient", 
+                    businessName: name, 
+                    niche: niche, 
+                    location: loc, 
+                    notes: notes 
+                }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                msgBox.innerText = result.message;
+                msgBox.style.color = "green";
+                // කොටු ටික හිස් කිරීම
+                document.getElementById('bizName').value = "";
+                document.getElementById('bizNiche').value = "";
+                document.getElementById('bizLoc').value = "";
+                document.getElementById('bizNotes').value = "";
+            } else {
+                msgBox.innerText = result.message;
+                msgBox.style.color = "red";
+            }
+        } catch (error) {
+            msgBox.innerText = "අන්තර්ජාල දෝෂයක්. කරුණාකර පසුව උත්සාහ කරන්න.";
+            msgBox.style.color = "red";
+        }
+    }
+
+    // AI Chat Box කේතය
+    let chatOpen = false;
     function toggleChat() {
         chatOpen = !chatOpen;
         document.getElementById('chat-body').style.display = chatOpen ? "flex" : "none";
@@ -61,7 +131,6 @@
 
         addMessageToChat("ඔබ", message, "user-msg");
         inputField.value = "";
-        
         addMessageToChat("AI", "හිතමින් පවතී...", "ai-msg");
 
         try {
@@ -74,7 +143,6 @@
             });
             
             const data = await response.json();
-            
             const chatBody = document.getElementById('chat-body');
             chatBody.removeChild(chatBody.lastChild);
 
@@ -83,12 +151,15 @@
                 const formattedReply = aiReply.replace(/
 http://googleusercontent.com/immersive_entry_chip/0
 
----
+**පියවර 2: යතුරු දෙක (Keys) ඇතුළත් කිරීම (අනිවාර්යයි)**
+ඔබ කේතය Paste කළ පසු එහි පහළට ගොස්,
+1. `YOUR_GEMINI_API_KEY` යන ස්ථානයට ඔබගේ Gemini API Key එක Paste කරන්න.
+2. `YOUR_WEB_APP_URL_HERE` යන ස්ථානයට ඔබගේ Google Apps Script ලින්ක් එක Paste කරන්න.
 
-**උපදෙස් මාලාව (Guide එක):**
+**පියවර 3: Save සහ පරීක්ෂා කිරීම**
+1. දකුණු පස ඇති කොළ පාට "Commit changes" ඔබා Save කරන්න.
+2. විනාඩි 2ක් පමණ රැඳී සිට වෙබ් අඩවිය Refresh කර Dashboard එකට යන්න.
+3. අලුත් සේවාදායකයෙකුගේ විස්තර ටයිප් කර "පද්ධතියට ඇතුළත් කරන්න" බොත්තම ඔබන්න. 
+4. ඉන්පසු ඔබගේ Google Sheet හි **Clients** Tab එකට ගොස් එම තොරතුරු එහි ස්වයංක්‍රීයව ලියවී ඇත්දැයි පරීක්ෂා කර බලන්න.
 
-1. GitHub එකේ `dashboard.html` එක Edit කරලා උඩ තියෙන කේතය සම්පූර්ණයෙන්ම Paste කරන්න.
-2. කේතයේ යටම තියෙන `YOUR_GEMINI_API_KEY` කියන තැනට ඔයාගේ API Key එක දාන්න. (උපුටා දැක්වීම් ලකුණු `""` මකන්න එපා).
-3. Save (Commit) කරන්න.
-
-දැන් අර කලින් ආපු Google දෝෂය සහ GitHub 404 දෝෂය නැතිවෙලා පද්ධතිය හරියට වැඩ කරනවද? ඒක හරිනම්, අපි ඊළඟට අලුත් සේවාදායකයින් (Clients) පද්ධතියට ඇතුළත් කරන කොටස කේතනය කිරීම පටන් ගමුද?
+මේ ටික හරියටම වැඩ කළාට පස්සේ මට කියන්න. ඊළඟට අපි අර ඔයා ඉල්ලපු AI Content Planner එක (මාසෙකට අදාළ Content අදහස් AI මගින් හදලා PDF කරන කොටස) මේක ඇතුළටම කේතනය කරමු!
