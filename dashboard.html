@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMM OS - Dashboard</title>
     <style>
-        /* පිටුව සහ Chat Box එක ලස්සන කරන කේත */
         body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f7f6; }
         .header { background-color: #2c3e50; color: white; padding: 15px; text-align: center; }
         .container { padding: 20px; }
         
-        /* AI Chat Box එකේ හැඩය */
         .chat-widget { position: fixed; bottom: 20px; right: 20px; width: 320px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; z-index: 1000; }
         .chat-header { background: #007bff; color: white; padding: 12px; font-weight: bold; cursor: pointer; text-align: center; font-size: 16px; }
         .chat-body { height: 350px; padding: 15px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 10px; }
@@ -47,10 +45,8 @@
 </div>
 
 <script>
-    // 🔴 ඉතා වැදගත්: පහත YOUR_GEMINI_API_KEY කියන තැනට ඔයා ගත්තු API Key එක Paste කරන්න.
     const GEMINI_API_KEY = "AIzaSyDRq-KH9Bn9mYW7hPUgeFH-SSrHafJ1eyY";
 
-    // Chat Box එක වහන්න සහ අරින්න
     let chatOpen = true;
     function toggleChat() {
         chatOpen = !chatOpen;
@@ -58,19 +54,17 @@
         document.getElementById('chat-input-area').style.display = chatOpen ? "flex" : "none";
     }
 
-    // AI වෙත පණිවිඩයක් යැවීම
     async function sendMessage() {
         const inputField = document.getElementById('chat-input');
         const message = inputField.value.trim();
         if (!message) return;
 
         addMessageToChat("ඔබ", message, "user-msg");
-        inputField.value = ""; // ටයිප් කරපු එක මකනවා
+        inputField.value = "";
         
-        addMessageToChat("AI", "හිතමින් පවතී...", "ai-msg"); // AI හිතනවා කියලා පෙන්වන්න
+        addMessageToChat("AI", "හිතමින් පවතී...", "ai-msg");
 
         try {
-            // Gemini API එකට පණිවිඩය යැවීම
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -81,34 +75,20 @@
             
             const data = await response.json();
             
-            // "හිතමින් පවතී..." කියන එක මකා දැමීම
             const chatBody = document.getElementById('chat-body');
             chatBody.removeChild(chatBody.lastChild);
 
             if (data.candidates && data.candidates[0].content.parts[0].text) {
                 const aiReply = data.candidates[0].content.parts[0].text;
-                // HTML කේතයක් (Code Block එකක්) එව්වොත් ඒක ලස්සනට පේන්න <pre> සහ <code> tags වලින් ඔතනවා
                 const formattedReply = aiReply.replace(/
 http://googleusercontent.com/immersive_entry_chip/0
 
-**පියවර 3: ඔයාගේ රහස් යතුර (API Key එක) ඇතුළත් කිරීම**
-1. ඔයා දැන් Paste කරපු කේතයේ යටටම යද්දී, `const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY";` කියලා පේළියක් තියෙනවා.
-2. අන්න එතන තියෙන `YOUR_GEMINI_API_KEY` කියන වචන ටික පරිස්සමින් මකලා, ඔයා කලින් Save කරගත්ත දිග API Key එක එතනට Paste කරන්න. (උපුටා දැක්වීම් ලකුණු "" අයින් කරන්න එපා).
-3. ඊට පස්සේ දකුණු පැත්තේ උඩ තියෙන කොළ පාට **"Commit changes..."** බොත්තම ඔබලා, ආයෙමත් එන කොටුවේ **"Commit changes"** ඔබන්න.
+---
 
-**පියවර 4: ලොග් වෙන පිටුව (index.html) Dashboard එකට සම්බන්ධ කිරීම**
-දැන් අපි ලොග් වුණාම මේ අලුත් පිටුවට යන්න හදමු.
-1. GitHub එකේ ඔයාගේ ගොනු ලැයිස්තුවෙන් **`index.html`** කියන එක ක්ලික් කරන්න.
-2. දකුණු පැත්තේ තියෙන පැන්සලක් වගේ අයිකන් එක (Edit) ඔබන්න.
-3. කේතයේ යටටම යද්දී `// මීළඟට අපි මෙතනින් Dashboard එකට යන විදිහ හදමු` කියලා පේළියක් ඇති.
-4. අන්න ඒ පේළියට හරියටම යටින් මේ කේත කෑල්ල විතරක් Copy කරලා Paste කරන්න:
-   `window.location.href = "dashboard.html";`
-5. දැන් නැවතත් කොළ පාට **"Commit changes..."** බොත්තම ඔබලා ඒක Save කරන්න.
+**උපදෙස් මාලාව (Guide එක):**
 
-**පරීක්ෂා කර බලමු! (Testing)**
-1. විනාඩියක් විතර ඉඳලා, ඔයාගේ අර කලින් ෆෝන් එකේ බලපු වෙබ් අඩවියේ ලින්ක් එකට ආයෙත් යන්න. (නැත්නම් Browser එක Refresh කරන්න).
-2. `admin` සහ `admin123` දීලා ලොග් වෙන්න.
-3. ලොග් වුණාම ඔටෝම අලුත් Dashboard පිටුවට යනවද බලන්න!
-4. එතන දකුණු පැත්තේ යට තියෙන AI සහයකයාගෙන් (Chat Box) මොනවා හරි අහලා බලන්න. (උදාහරණයක් විදිහට: *"මට HTML වලින් ලස්සන Button එකක් හදන්න Code එකක් දෙන්න"* කියලා අහලා බලන්න).
+1. GitHub එකේ `dashboard.html` එක Edit කරලා උඩ තියෙන කේතය සම්පූර්ණයෙන්ම Paste කරන්න.
+2. කේතයේ යටම තියෙන `YOUR_GEMINI_API_KEY` කියන තැනට ඔයාගේ API Key එක දාන්න. (උපුටා දැක්වීම් ලකුණු `""` මකන්න එපා).
+3. Save (Commit) කරන්න.
 
-ඔක්කොම හරියට වැඩ කරනවා නම් මට "හරි" කියලා කියන්න. එතකොට අපි ඊළඟට Dashboard එක ඇතුළේ Clients ලාව එකතු කරන ෆෝරම් (Form) එක හදමු! ගැටලුවක් ආවොත් බය නැතුව අහන්න.
+දැන් අර කලින් ආපු Google දෝෂය සහ GitHub 404 දෝෂය නැතිවෙලා පද්ධතිය හරියට වැඩ කරනවද? ඒක හරිනම්, අපි ඊළඟට අලුත් සේවාදායකයින් (Clients) පද්ධතියට ඇතුළත් කරන කොටස කේතනය කිරීම පටන් ගමුද?
